@@ -12,13 +12,13 @@
 ## 文件结构
 
 ```
-黑白Galaxy组件展示.html   # 主页面（单文件，内联 CSS/JS）
+index.html                # 主页面（单文件，内联 CSS/JS；建站平台默认首页）
 assets/                   # 运行依赖：6 张课程卡通插画 + 微信二维码
 ```
 
 ## 本地打开
 
-直接用浏览器打开 `黑白Galaxy组件展示.html`，或在 VSCode 中安装 Live Server 插件后右键“Open with Live Server”。
+直接用浏览器打开 `index.html`，或在 VSCode 中安装 Live Server 插件后右键“Open with Live Server”。
 
 ## 联系
 
