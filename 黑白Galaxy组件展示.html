@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>遏云歌 · 虚拟网络课程</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%23fff'/%3E%3Cg fill='%23fff'%3E%3Ccircle cx='52' cy='20' r='2'/%3E%3Ccircle cx='14' cy='46' r='2'/%3E%3Ccircle cx='48' cy='48' r='1.5'/%3E%3Ccircle cx='20' cy='14' r='1.5'/%3E%3Ccircle cx='56' cy='38' r='1.5'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link href="https://miaoda.feishu.cn/fonts/css2?family=Smiley+Sans&family=ZCOOL+KuaiLe&family=LXGW+WenKai&family=Zhi+Mang+Xing&family=Long+Cang&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --ink:#000000;
+  --g100:#f5f5f5; --g200:#e6e6e6; --g300:#d0d0d0; --g400:#9b9b9b; --g500:#757575; --g600:#3d3d3d; --g700:#222;
+  --ui:system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --disp:"Smiley Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--ui);background:#0a0c12;color:#f2f3f5;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+img,svg{display:block}
+::selection{background:var(--paper);color:var(--ink)}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+/* ===== 导航 ===== */
+.nav{position:sticky;top:0;z-index:50;background:rgba(8,10,16,.92);border-bottom:1px solid #6a707c}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:baseline;gap:8px;font-weight:900;letter-spacing:.06em;font-size:22px;line-height:1}
+.brand small{font-weight:700;color:#9aa0aa;letter-spacing:.22em;font-size:11px}
+.nav-links{display:flex;align-items:center;gap:20px;font-size:14px;font-weight:600}
+.nav-links a{padding:6px 2px;border-bottom:2px solid transparent;transition:border-color .2s}
+.nav-links a:hover{border-bottom-color:#fff}
+
+/* ===== Hero（炫彩 3D 星空：旋转星云 + 鼠标跟手） ===== */
+.hero{position:relative;background:transparent;color:var(--paper)}
+.hero-in{position:relative;z-index:2;padding:110px 20px 120px;max-width:1180px;margin:0 auto;text-align:center}
+.hero-kicker{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.24em;color:#c3c7cf;border:1px solid #6a707c;padding:6px 16px;margin:0 auto 26px}
+.hero-kicker::before{content:"";width:6px;height:6px;background:var(--paper);border-radius:50%;animation:blink 1.6s steps(2,start) infinite}
+@keyframes blink{50%{opacity:0}}
+.hero h1{font-family:"Zhi Mang Xing","Long Cang","ZCOOL KuaiLe","LXGW WenKai","Smiley Sans","PingFang SC","Microsoft YaHei",sans-serif;font-size:clamp(56px,10vw,150px);font-weight:400;line-height:1.15;letter-spacing:.04em}
+.hero-sub{margin:24px auto 0;max-width:660px;color:#c3c7cf;font-size:17px;line-height:1.9;letter-spacing:.02em}
+.hero-sub b{color:var(--paper)}
+.hero-stat{margin-top:30px;display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;font-family:var(--mono);font-size:13px;color:#9aa0aa}
+.hero-stat b{color:var(--paper);font-size:15px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:38px}
+.scroll-hint{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;color:#6a707c;font-size:11px;letter-spacing:.3em;animation:float 2.4s ease-in-out infinite}
+@keyframes float{50%{transform:translate(-50%,6px)}}
+
+/* ===== 全页星空背景 ===== */
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;touch-action:pan-y}
+main{position:relative;z-index:1}
+.foot{position:relative;z-index:1}
+
+/* ===== 章节标题 ===== */
+section{padding:76px 0 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:34px}
+.sec-head h2{font-family:var(--disp);font-size:clamp(28px,4.5vw,46px);font-weight:800;letter-spacing:-.01em}
+.sec-head p{color:#9aa0aa;font-size:14px;max-width:460px}
+
+/* ===== 作品展示（galaxy 组件演示） ===== */
+.w-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:600px){.w-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:960px){.w-grid{grid-template-columns:repeat(3,1fr)}}
+.el{display:flex;border:1px solid #fff;background:rgba(255,255,255,.05);flex-direction:column;transition:transform .18s,box-shadow .18s}
+.el:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 #fff}
+.el:active{transform:translate(0,0);box-shadow:0 0 0 #fff}
+.el-head{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #fff;background:rgba(255,255,255,.08)}
+.el-name{font-size:13px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+.el-tag{font-size:11px;color:#c3c7cf;border:1px solid #6a707c;padding:2px 8px;font-family:var(--mono)}
+.el-pic{aspect-ratio:3/2;overflow:hidden;border-bottom:1px solid #fff;background:#10141c}
+.el-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.el-body{padding:14px 16px;font-size:13px;color:#cfd2d8}
+.el-body p b{color:#fff}
+
+/* 演示：实心按钮 */
+.b-solid{background:var(--paper);color:var(--ink);border:1px solid var(--paper);padding:12px 28px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,box-shadow .15s,transform .15s;min-height:44px}
+.b-solid:hover{background:var(--ink);color:var(--paper);box-shadow:5px 5px 0 var(--paper);transform:translate(-2px,-2px)}
+.b-solid:active{transform:translate(1px,1px);box-shadow:2px 2px 0 var(--paper)}
+/* 演示：滑动反转按钮 */
+.b-slide{position:relative;overflow:hidden;border:2px solid var(--paper);background:var(--paper);color:var(--ink);padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;min-height:44px}
+.b-slide::before{content:"";position:absolute;inset:0;background:var(--ink);transform:translateX(-101%);transition:transform .35s cubic-bezier(.7,0,.3,1)}
+.b-slide span{position:relative;z-index:1;transition:color .35s}
+.b-slide svg{position:relative;z-index:1;width:14px;height:14px;margin-left:8px;vertical-align:-2px;transition:transform .35s}
+.b-slide:hover::before{transform:translateX(0)}
+.b-slide:hover span{color:var(--paper)}
+.b-slide:hover svg{transform:translateX(5px)}
+
+/* ===== 关于我们 ===== */
+.about{padding:76px 0 0}
+.about-lead{display:grid;grid-template-columns:1fr;gap:28px;margin-bottom:44px}
+@media(min-width:760px){.about-lead{grid-template-columns:1.1fr .9fr}}
+.about-lead p{font-size:15px;color:#d6d9de;max-width:560px}
+.about-lead p b{color:#fff}
+.about-lead .lead-stat{border:1px solid #fff;background:rgba(255,255,255,.06);padding:22px 24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-content:center}
+.about-lead .lead-stat .st b{display:block;font-size:26px;font-weight:900;font-family:var(--mono)}
+.about-lead .lead-stat .st span{font-size:12px;color:#9aa0aa}
+.c-grid{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:760px){.c-grid{grid-template-columns:1fr 1fr}}
+.qr-card{width:min(100%,240px);border:1px solid #fff;background:rgba(255,255,255,.06);padding:16px}
+.qr-name{font-size:13px;font-weight:800;letter-spacing:.18em;margin-bottom:10px}
+.qr-box{border:1px solid #8b8f98;background:#fff;display:grid;place-items:center;padding:10px}
+.qr-box img{width:100%;height:auto;display:block}
+.qr-hint{font-size:12px;color:#9aa0aa;margin-top:8px;line-height:1.5}
+.mc{width:min(100%,280px);border:1px solid #fff;background:rgba(255,255,255,.06)}
+.mc .mchead{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid #fff}
+.mc .env{width:42px;height:42px;border:1px solid #fff;display:grid;place-items:center;flex:none}
+.mc .env svg{width:20px;height:20px;stroke:#fff}
+.mc .mcn{font-weight:800;font-size:15px;color:#fff}
+.mc .mcc{font-size:12px;color:#9aa0aa;margin-top:1px}
+.mc .maddr{padding:11px 16px;font-family:var(--mono);font-size:13px;border-bottom:1px solid #fff;display:flex;align-items:center;gap:8px;min-width:0;color:#fff}
+.mc .maddr span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mc .mcrow{display:flex;gap:8px;padding:12px 16px}
+.mc .mailto{flex:1;border:1px solid var(--paper);background:var(--paper);color:var(--ink);padding:10px 0;font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:background .15s,color .15s;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.mc .mailto:hover{background:var(--ink);color:var(--paper)}
+.mc .mcopy{flex:1;border:1px solid #fff;background:transparent;color:#fff;padding:10px 0;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s;min-height:44px}
+.mc .mcopy:hover{background:rgba(255,255,255,.12)}
+.c-side{display:flex;flex-direction:column;gap:14px;justify-content:center}
+.c-side h3{font-size:22px;font-weight:900}
+.c-side p{font-size:14px;color:#9aa0aa;max-width:380px}
+
+/* ===== 页脚 ===== */
+.foot{border-top:1px solid #6a707c;margin-top:80px;background:rgba(8,10,16,.94);color:var(--paper)}
+.foot-in{padding:40px 20px;max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:center}
+.foot b{font-size:16px;letter-spacing:.06em}
+.foot p{font-size:13px;color:#9aa0aa}
+.foot a{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--g500);color:var(--paper);padding:9px 16px;font-size:13px;font-weight:600;transition:background .15s,color .15s}
+.foot a:hover{background:var(--paper);color:var(--ink)}
+.foot a svg{width:14px;height:14px}
+
+/* ===== toast ===== */
+.toast-wrap{position:fixed;right:18px;top:72px;z-index:100;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;background:#11151d;color:var(--paper);padding:12px 16px;font-size:13px;border:1px solid #fff;box-shadow:5px 5px 0 #3d3d3d;animation:tin .3s ease;pointer-events:auto}
+.toast.out{animation:tout .3s ease forwards}
+.toast svg{width:16px;height:16px;flex:none}
+@keyframes tin{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateX(30px)}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" aria-label="返回顶部">遏云歌<small>/ CNOAT ACADEMY</small></a>
+    <nav class="nav-links" aria-label="主导航">
+      <a href="#top">首页</a>
+      <a href="#works">作品</a>
+      <a href="#about">关于我们</a>
+      <a href="#contact">联系我们</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ===== 首页：炫彩 3D 星空（星云旋转 + 鼠标跟手，全页背景） ===== -->
+  <section class="hero">
+    <div class="hero-in">
+      <span class="hero-kicker">VIRTUAL COURSE · 虚拟网络课程</span>
+      <h1>遏云歌</h1>
+      <p class="hero-sub">一门<b>从零到实战</b>的网页开发网课。移动鼠标，<b>炫彩光点</b>如影随形、拖出星光尾迹，点击迸发星光冲击波。</p>
+      <div class="hero-stat"><b>300+</b> 课时 · <b>12</b> 个实战项目 · <b>98%</b> 学员好评 · <b>7×24</b> 助教答疑</div>
+      <div class="hero-cta">
+        <button class="b-slide" type="button" data-goto="#works"><span>查看作品</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="b-solid" type="button" data-goto="#about">关于我们</button>
+        <button class="b-solid" type="button" data-goto="#contact">联系我们</button>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">MOVE &amp; TOUCH</div>
+  </section>
+
+  <!-- ===== 作品展示 ===== -->
+  <section id="works" aria-label="作品展示">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>作品展示</h2>
+        <p>六大课程模块的黑白卡通作品展示，一触即动，仅作宣传展示。</p>
+      </div>
+      <div class="w-grid">
+        <article class="el">
+          <div class="el-head"><span class="el-name">网页基础模块</span><span class="el-tag">module 01</span></div>
+          <div class="el-pic"><img src="assets/web-basics.jpg" alt="网页基础模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>从 HTML 结构到页面语义，<b>零基础</b>搭出第一张网页。</p></div>
+        </article>
+        <article class="el">
+          <div class="el-head"><span class="el-name">黑白设计系统</span><span class="el-tag">module 02</span></div>
+          <div class="el-pic"><img src="assets/design-system.jpg" alt="黑白设计系统模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>建立色板、字阶与间距规范，<b>黑白之上造秩序</b>。</p></div>
+        </article>
+        <article class="el">
+          <div class="el-head"><span class="el-name">JavaScript 交互</span><span class="el-tag">module 03</span></div>
+          <div class="el-pic"><img src="assets/js-interaction.jpg" alt="JavaScript 交互模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>事件、状态与动效，<b>让页面听得懂点击</b>。</p></div>
+        </article>
+        <article class="el">
+          <div class="el-head"><span class="el-name">Canvas 动效</span><span class="el-tag">module 04</span></div>
+          <div class="el-pic"><img src="assets/canvas-motion.jpg" alt="Canvas 动效模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>画笔与粒子，在画布上<b>画出生动的视觉</b>。</p></div>
+        </article>
+        <article class="el">
+          <div class="el-head"><span class="el-name">组件化实战</span><span class="el-tag">module 05</span></div>
+          <div class="el-pic"><img src="assets/component.jpg" alt="组件化实战模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>拆解、复用、封装，<b>像搭积木一样做页面</b>。</p></div>
+        </article>
+        <article class="el">
+          <div class="el-head"><span class="el-name">部署上线</span><span class="el-tag">module 06</span></div>
+          <div class="el-pic"><img src="assets/deploy.jpg" alt="部署上线模块黑白卡通插画" loading="lazy"></div>
+          <div class="el-body"><p>构建、打包、发布，<b>让作品真正上线</b>。</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 关于我们 ===== -->
+  <section id="about" class="about" aria-label="关于我们">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>关于我们</h2>
+        <p>遏云歌是一所专注于网页开发教学的虚拟网络课程平台。</p>
+      </div>
+      <div class="about-lead">
+        <p>我们相信，最好的教学是<b>做出作品</b>。全部课程围绕 12 个真实项目展开，直播答疑、录播回放、认证证书一站式配齐。页面组件模板源自 uiverse.io/galaxy 开源社区，黑白重构、动态呈现，向每一位来访者展示我们的审美与实力。</p>
+        <div class="lead-stat">
+          <div class="st"><b>300+</b><span>课时总量</span></div>
+          <div class="st"><b>12</b><span>实战项目</span></div>
+          <div class="st"><b>98%</b><span>学员好评</span></div>
+          <div class="st"><b>7×24</b><span>助教答疑</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 联系我们 ===== -->
+  <section id="contact" aria-label="联系我们">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>联系我们</h2>
+        <p>扫码加好友，或直接写信。点击卡片上的按钮立刻响应。</p>
+      </div>
+      <div class="c-grid">
+        <div>
+          <div class="qr-card">
+            <div class="qr-name">BOOMOAT</div>
+            <div class="qr-box"><img src="assets/wechat-qr.png" alt="BOOMOAT 微信二维码"></div>
+            <p class="qr-hint">长按识别二维码，扫码加微信好友。</p>
+          </div>
+        </div>
+        <div class="c-side">
+          <h3>写邮件给我们</h3>
+          <p>合作、投稿、课程咨询都可以发邮件。工作日 48 小时内回复。</p>
+          <div class="mc">
+            <div class="mchead">
+              <div class="env"><svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="1"/><path d="m3 6 9 7 9-7"/></svg></div>
+              <div><div class="mcn">写邮件联系</div><div class="mcc">工作日 48 小时内回复</div></div>
+            </div>
+            <div class="maddr"><span id="mcAddr">chinaoat@petalmail.com</span></div>
+            <div class="mcrow">
+              <a class="mailto" href="mailto:chinaoat@petalmail.com">写邮件</a>
+              <button class="mcopy" type="button">复制邮箱</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div><b>遏云歌 CNOAT ACADEMY</b><p>虚拟网络课程 · 页面组件模板源自 uiverse.io/galaxy（MIT 协议）</p></div>
+    <p>© 2026 遏云歌 · 仅展示</p>
+  </div>
+</footer>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- toast ---------- */
+var toastWrap = document.getElementById("toasts");
+function toast(msg, ok){
+  var t = document.createElement("div");
+  t.className = "toast" + (ok ? " ok" : "");
+  t.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg><span></span>';
+  t.querySelector("span").textContent = msg;
+  toastWrap.appendChild(t);
+  setTimeout(function(){ t.classList.add("out"); setTimeout(function(){ t.remove(); }, 320); }, 2400);
+}
+
+/* ---------- 首页大图：炫彩 3D 星空（旋转星云 + 鼠标跟手 + 点击冲击） ---------- */
+var cv = document.getElementById("bg");
+var ctx = cv.getContext("2d");
+var W = 0, H = 0;
+var ptr = { x: -1e4, y: -1e4, down: false };
+var stars = [];              /* 星云粒子：发光星点，分布自然不密集 */
+var ring = [];               /* 核心星环：一圈较亮的星 */
+var ripples = [];            /* 点击冲击环（炫彩描边） */
+var sparks = [];             /* 点击星光迸发 */
+var trail = [];              /* 鼠标跟随拖尾 */
+var spinX = 0, tiltY = 0;    /* 鼠标驱动的旋转/俯仰（缓动） */
+
+function resize(){
+  W = cv.width = cv.offsetWidth;
+  H = cv.height = cv.offsetHeight;
+  if (stars.length === 0){
+    var n = W < 700 ? 95 : 170;    /* 窄屏降密度，保持不密集 */
+    for (var i = 0; i < n; i++){
+      var th = Math.random()*Math.PI*2;
+      var ph = Math.acos(2*Math.random()-1);
+      var R = 0.34 + Math.random()*0.66;
+      var hue = 200 + Math.random()*140;      /* 青 200 → 蓝 → 紫 → 粉 340 */
+      if (Math.random() < 0.2) hue = 175 + Math.random()*45;   /* 少数青绿点缀 */
+      stars.push({ th: th, ph: ph, R: R, hue: hue, s: 0.7 + Math.random()*1.9, tw: 0.4 + Math.random()*0.6, sp: 0.00022 + Math.random()*0.0005 });
+    }
+    for (var j = 0; j < 16; j++){
+      ring.push({ th: j/16*Math.PI*2, R: 0.30 + (Math.random()-0.5)*0.05, s: 1.5 + Math.random()*1.6, hue: 215 + Math.random()*110, sp: 0.0009 });
+    }
+  }
+}
+function setPtr(e){
+  var r = cv.getBoundingClientRect();
+  ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top;
+}
+/* 球坐标 → 屏幕：绕 Y 自转 + 俯仰 + 近大远小 */
+function project(th, ph, R, rotY, rotX){
+  var cph = Math.cos(ph), sph = Math.sin(ph);
+  var cth = Math.cos(th + rotY), sth = Math.sin(th + rotY);
+  var cx = cph * cth;
+  var cy = sph;
+  var cz = cph * sth;
+  var cy2 = cy*Math.cos(rotX) - cz*Math.sin(rotX);
+  var cz2 = cy*Math.sin(rotX) + cz*Math.cos(rotX);
+  var z = 0.42 + 0.58*cz2;
+  return { x: W/2 + cx*R*W*0.46*z, y: H*0.55 - cy2*R*W*0.46*z, z: z };
+}
+/* 发光星点：外晕 + 亮核 */
+function drawStar(x, y, r, hue, alpha){
+  var g = ctx.createRadialGradient(x, y, 0, x, y, r*3.4);
+  g.addColorStop(0, "hsla(" + hue + ",82%,74%," + alpha + ")");
+  g.addColorStop(0.45, "hsla(" + hue + ",82%,62%," + (alpha*0.42) + ")");
+  g.addColorStop(1, "hsla(" + hue + ",80%,55%,0)");
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(x, y, r*3.4, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = "hsla(" + hue + ",88%,90%," + alpha + ")";
+  ctx.beginPath(); ctx.arc(x, y, r*0.5, 0, Math.PI*2); ctx.fill();
+}
+function tpl3D(t){
+  ctx.clearRect(0, 0, W, H);
+  /* 鼠标驱动的旋转：指针位置映射自转与俯仰，缓动跟随 */
+  var targetSpin = 0, targetTilt = 0.38;
+  if (ptr.x > -1e3 && ptr.y > -1e3){
+    targetSpin = ((ptr.x / Math.max(1, W)) - 0.5) * 1.3;
+    targetTilt = 0.38 + ((ptr.y / Math.max(1, H)) - 0.5) * 0.55;
+  }
+  spinX += (targetSpin - spinX) * 0.03;
+  tiltY += (targetTilt - tiltY) * 0.03;
+  var rotY = t*0.00012 + spinX;
+  var rotX = tiltY;
+  /* 星云粒子：触达处被点亮、微微推离 */
+  for (var i = 0; i < stars.length; i++){
+    var st = stars[i];
+    var p = project(st.th + t*st.sp, st.ph, st.R, rotY, rotX);
+    if (p.z < 0.05) continue;
+    var twv = st.tw * (0.6 + 0.4*Math.sin(t*0.0012 + p.z*8 + st.th));
+    var hot = 1;
+    if (ptr.x > -1e3 && ptr.y > -1e3){
+      var dx = p.x - ptr.x, dy = p.y - ptr.y;
+      var d2 = dx*dx + dy*dy;
+      if (d2 < 120*120){
+        var f = 1 - Math.sqrt(d2)/120;
+        hot = 1 + 0.9*f;
+        p.x += dx * f * 0.5;
+        p.y += dy * f * 0.5;
+      }
+    }
+    drawStar(p.x, p.y, st.s * (0.7 + 0.6*p.z) * twv * hot, st.hue, (0.3 + 0.55*p.z) * twv);
+  }
+  /* 核心星环：更亮、更大 */
+  for (var j = 0; j < ring.length; j++){
+    var rg = ring[j];
+    var p2 = project(rg.th + t*rg.sp, Math.PI/2, rg.R, rotY, rotX);
+    if (p2.z < 0.05) continue;
+    drawStar(p2.x, p2.y, rg.s * (0.8 + 0.5*p2.z), rg.hue, 0.5 + 0.4*p2.z);
+  }
+  /* 核心光晕：柔和星核托底 */
+  var core = project(0, 0, 0.02, rotY, rotX);
+  var cg = ctx.createRadialGradient(core.x, core.y, 2, core.x, core.y, 90);
+  cg.addColorStop(0, "hsla(265,70%,78%,0.30)");
+  cg.addColorStop(0.5, "hsla(230,75%,70%,0.12)");
+  cg.addColorStop(1, "hsla(210,80%,65%,0)");
+  ctx.fillStyle = cg;
+  ctx.beginPath(); ctx.arc(core.x, core.y, 90, 0, Math.PI*2); ctx.fill();
+  /* 点击冲击环（炫彩描边） */
+  for (var k = ripples.length - 1; k >= 0; k--){
+    var wv = ripples[k];
+    wv.r += wv.vr; wv.a *= 0.94;
+    if (wv.a < 0.04){ ripples.splice(k, 1); continue; }
+    ctx.strokeStyle = "hsla(" + wv.hue + ",85%,72%," + (wv.a*0.9).toFixed(3) + ")";
+    ctx.lineWidth = 2 * wv.a;
+    ctx.beginPath();
+    ctx.ellipse(wv.x, wv.y, wv.r, wv.r*0.42, 0, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  /* 点击星光迸发 */
+  for (var s2 = sparks.length - 1; s2 >= 0; s2--){
+    var sp = sparks[s2];
+    sp.life -= 0.03; sp.x += sp.vx; sp.y += sp.vy;
+    if (sp.life <= 0){ sparks.splice(s2, 1); continue; }
+    drawStar(sp.x, sp.y, sp.s*sp.life, sp.hue, sp.life*0.9);
+  }
+  /* 鼠标跟随：炫彩光点 + 星光拖尾（如影随形） */
+  if (ptr.x > -1e3 && ptr.y > -1e3){
+    trail.push({ x: ptr.x, y: ptr.y });
+    if (trail.length > 14) trail.shift();
+    for (var ti = 0; ti < trail.length - 1; ti++){
+      var tp = trail[ti];
+      var tv = (ti + 1) / trail.length;
+      drawStar(tp.x, tp.y, 0.8 + tv*1.6, 205 + ti*7, tv*0.6);
+    }
+    var cg2 = ctx.createRadialGradient(ptr.x, ptr.y, 0, ptr.x, ptr.y, 46);
+    cg2.addColorStop(0, "hsla(300,90%,86%,0.95)");
+    cg2.addColorStop(0.25, "hsla(265,90%,72%,0.55)");
+    cg2.addColorStop(0.6, "hsla(215,95%,65%,0.18)");
+    cg2.addColorStop(1, "hsla(195,95%,60%,0)");
+    ctx.fillStyle = cg2;
+    ctx.beginPath(); ctx.arc(ptr.x, ptr.y, 46, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(ptr.x, ptr.y, 3.2, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = "hsla(255,90%,85%,0.8)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(ptr.x - 11, ptr.y); ctx.lineTo(ptr.x + 11, ptr.y);
+    ctx.moveTo(ptr.x, ptr.y - 11); ctx.lineTo(ptr.x, ptr.y + 11);
+    ctx.stroke();
+  }
+}
+/* 点击：双冲击环 + 星光迸发 + 星云轻微扰动 */
+function poke(x, y){
+  var hueA = 200 + Math.random()*140;
+  ripples.push({ x: x, y: y, r: 8, vr: 13, a: 1, hue: hueA });
+  ripples.push({ x: x, y: y, r: 4, vr: 19, a: 0.55, hue: hueA + 40 });
+  for (var j = 0; j < 9; j++){
+    var ang = Math.random()*Math.PI*2, sp = 1.0 + Math.random()*2.8;
+    sparks.push({ x: x, y: y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, s: 1.6 + Math.random()*2.2, hue: 190 + Math.random()*160, life: 1 });
+  }
+  for (var i = 0; i < stars.length; i++){
+    var st = stars[i];
+    st.th += (Math.random()-0.5)*0.012;
+    st.ph += (Math.random()-0.5)*0.012;
+  }
+}
+
+function frame(t){
+  tpl3D(t);
+  if (!reduce) requestAnimationFrame(frame);
+}
+/* 布局就绪后强制重绘一次，避免首帧画在 0 尺寸画布上 */
+function drawNow(){
+  resize();
+  tpl3D(reduce ? 0 : performance.now());
+}
+resize();
+window.addEventListener("resize", drawNow);
+window.addEventListener("load", drawNow);
+
+window.addEventListener("pointerdown", function(e){
+  ptr.down = true; setPtr(e); poke(ptr.x, ptr.y);
+});
+window.addEventListener("pointermove", function(e){
+  if (e.pointerType === "mouse" || ptr.down) setPtr(e);
+});
+window.addEventListener("pointerup", function(){ ptr.down = false; });
+document.documentElement.addEventListener("mouseleave", function(){ ptr.x = -1e4; ptr.y = -1e4; });
+
+if (!reduce){
+  requestAnimationFrame(frame);
+} else {
+  tpl3D(0);
+}
+
+/* ---------- 按钮行为（仅展示与锚点导航，无后端） ---------- */
+document.addEventListener("click", function(e){
+  var g = e.target.closest("[data-goto]");
+  if (!g) return;
+  var el = document.querySelector(g.getAttribute("data-goto"));
+  if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+});
+
+/* 复制邮箱 */
+document.addEventListener("click", function(e){
+  var b = e.target.closest(".mcopy");
+  if (!b) return;
+  var addr = document.getElementById("mcAddr");
+  copyText(addr ? addr.textContent.trim() : "chinaoat@petalmail.com", function(){
+    toast("邮箱地址已复制", true);
+  });
+});
+function copyText(txt, done){
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(done, function(){ legacyCopy(txt, done); });
+  } else {
+    legacyCopy(txt, done);
+  }
+}
+function legacyCopy(txt, done){
+  var ta = document.createElement("textarea");
+  ta.value = txt;
+  ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand("copy"); done(); } catch(e){ done(); }
+  ta.remove();
+}
+})();
+</script>
+
+
+</body>
+</html>

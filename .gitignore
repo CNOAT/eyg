@@ -1,0 +1,6 @@
+# 非交付物：历史备份 / 自检产物 / 本地工具目录
+_backup/
+_shots/
+.creative-design/
+.vscode/
+*.js
