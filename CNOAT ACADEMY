@@ -273,8 +273,8 @@ section{padding:76px 0 0}
 
 <footer class="foot">
   <div class="foot-in">
-    <div><b>遏云歌 CNOAT ACADEMY</b><p>虚拟网络课程 · 页面组件模板源自 uiverse.io/galaxy（MIT 协议）</p></div>
-    <p>© 2026 遏云歌 · 仅展示</p>
+    <div><b>遏云歌 CNOAT TEST</b><p>源于 uiverse.io/galaxy（MIT 协议）</p></div>
+    <p>© 2026 遏云歌 · TEST</p>
   </div>
 </footer>
 
